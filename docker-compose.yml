@@ -6,7 +6,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     ports:
-      - "2168:2181"
+      - "2168:2181" #Expose port [2168]
     healthcheck:
       test: ["CMD", "echo", "ruok", "|", "nc", "-w", "3", "localhost", "2181", "|", "grep", "imok"]
       interval: 30s
@@ -21,13 +21,13 @@ services:
         condition: service_healthy
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181 #Connect to Zookeeper Service
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     volumes:
-      - kafka_data:/var/lib/kafka/data
+      - kafka_data:/var/lib/kafka/data #Mount Volume
     ports:
-      - "9168:9092"
+      - "9168:9092" #Expose port [9168]
     healthcheck:
       test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
       interval: 30s
