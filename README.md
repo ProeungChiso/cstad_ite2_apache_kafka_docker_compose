@@ -1,7 +1,7 @@
 # cstad_ite2_apache_kafka_docker_compose
 My Config for installation Apache Kafka &amp; Zookeeper.
-- main branch use for single Kafka broker.
-- three-brokers use for multi Kafka broker. 
+- main branch used for single Kafka broker.
+- three-brokers branch used for multi Kafka broker. 
 
 # resources
 - Config volume: https://docs.confluent.io/platform/current/installation/docker/operations/external-volumes.html
