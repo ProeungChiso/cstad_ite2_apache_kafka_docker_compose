@@ -5,6 +5,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - kafka-network
     ports:
       - "2181:2181"
     healthcheck:
@@ -16,24 +18,29 @@ services:
   kafka:
     image: confluentinc/cp-kafka:7.4.6
     container_name: kafka
+    network_mode: "host"  # Directly binds Kafka to the host network for external access
     depends_on:
       zookeeper:
         condition: service_healthy
     environment:
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://68.183.187.158:9092
-      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://localhost:9093,OUTSIDE://68.183.187.158:9092
+      KAFKA_LISTENERS: INSIDE://localhost:9093,OUTSIDE://68.183.187.158:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: localhost:2181
+      KAFKA_MESSAGE_MAX_BYTES: 10485760        # Set max message size to 10MB
+      KAFKA_REPLICA_FETCH_MAX_BYTES: 10485760  # Ensure brokers can fetch large messages
     volumes:
-      - kafka_data:/var/lib/kafka/data
-    ports:
-      - "9092:9092"
+      - kafka_data_vol1:/var/lib/kafka/data
     healthcheck:
-      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "68.183.187.158:9092"]
       interval: 30s
       timeout: 10s
       retries: 5
 
+networks:
+  kafka-network:  # Define custom network
+    driver: bridge
+
 volumes:
-  kafka_data:
+  kafka_data_vol1:
